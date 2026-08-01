@@ -21,7 +21,7 @@ try {
 }
 
 const STORAGE_KEYS = {
-  DATA: 'SEMICON_HUB_DATA_V6', // V6로 갱신하여 언론사별 기사 5개 및 용어 50개 자동 로드
+  DATA: 'SEMICON_HUB_DATA_V7', // V7로 갱신하여 5대 언론사(25개 기사) 및 용어 50개 자동 로드
   PASSWORD: 'SEMICON_HUB_ADMIN_PW'
 };
 
@@ -30,7 +30,7 @@ const DEFAULT_DATA = {
     name: "권지연 (JiYeon Kwon)",
     phone: "010-2993-4116",
     email: "kjk09002@gmail.com",
-    bio: "최신 반도체 시장 동향과 복잡한 반도체 용어를 초보자부터 전문가까지 한눈에 쉽게 파악할 수 있도록 큐레이션하는 반도체 기술 연구원입니다."
+    bio: "최신 반도체 기술 동향과 핵심 개념을 쉽게 이해할 수 있도록 큐레이션하는 반도체 전문 연구원 권지연입니다."
   },
   concepts: [
     {
@@ -338,6 +338,148 @@ const DEFAULT_DATA = {
           ],
           sourceUrl: "https://www.hankyung.com",
           tag: "팹리스 / NPU"
+        }
+      ]
+    },
+    donga: {
+      pressName: "동아일보",
+      badgeColor: "#d32f2f",
+      articles: [
+        {
+          id: "donga_1",
+          title: "글로벌 빅테크 AI 인프라 투자 지속… HBM 장기 구조적 성장 청신호",
+          date: "2026.08.01",
+          reporter: "산업부 곽도영 기자",
+          summaryPoints: [
+            "빅테크 기업들의 AI 데이터센터 투자 확대로 고성능 HBM 수요 장기 지속 보증",
+            "단순 경기 순환을 넘어 구조적 성장 산업으로 전환되는 메모리 반도체 지형",
+            "차세대 HBM4 턴키 공급 역량을 확보한 한국 반도체 기업들의 글로벌 수주 우위"
+          ],
+          sourceUrl: "https://www.donga.com",
+          tag: "AI인프라 / HBM"
+        },
+        {
+          id: "donga_2",
+          title: "삼성-SK, AI 반도체 생태계 주도권 잡기… 파운드리·패키징 총력전",
+          date: "2026.07.27",
+          reporter: "IT이슈부 홍석호 기자",
+          summaryPoints: [
+            "AI 가속기 시장 팽창에 대응해 D램 적층 패키징 및 초미세 파운드리 기술 집약",
+            "대만 파운드리 및 주요 팹리스 고객사와의 전략적 기술 얼라이언스 결성",
+            "2026년 하반기 차세대 AI 메모리 양산 라인 가동으로 수익성 극대화"
+          ],
+          sourceUrl: "https://www.donga.com",
+          tag: "기술총력전"
+        },
+        {
+          id: "donga_3",
+          title: "온디바이스 AI 시대 본격 개막… 수혜 반도체 밸류체인 지형도",
+          date: "2026.07.20",
+          reporter: "경제부 박희창 기자",
+          summaryPoints: [
+            "스마트폰·노트북 등 단말기 단에서 실시간 AI 연산을 수행하는 온디바이스 기술 급부상",
+            "저전력 고성능 NPU 및 LPDDR5X 메모리 탑재 비중 급증",
+            "국내 팹리스 및 OSAT 후공정 협력사들의 매출 성장 모멘텀 가시화"
+          ],
+          sourceUrl: "https://www.donga.com",
+          tag: "온디바이스 / 밸류체인"
+        },
+        {
+          id: "donga_4",
+          title: "차세대 반도체 클러스터 용인 팹 건설 착착… 국가 경쟁력 부각",
+          date: "2026.07.14",
+          reporter: "정책이슈부 이건혁 기자",
+          summaryPoints: [
+            "세계 최대 규모 용인 반도체 메가 클러스터 기반 시설 및 팹 건설 순항",
+            "전력·용수 인프라 적기 공급 및 소부장 R&D 연계 테스트베드 구축",
+            "글로벌 반도체 제조 거점으로서의 국가 첨단 산업 입지 강화"
+          ],
+          sourceUrl: "https://www.donga.com",
+          tag: "클러스터 / 인프라"
+        },
+        {
+          id: "donga_5",
+          title: "글로벌 반도체 공급망 재편 속에 국내 소부장 강소기업 기술 약진",
+          date: "2026.07.07",
+          reporter: "산업부 김현수 기자",
+          summaryPoints: [
+            "식각액, 감광액, ALD 증착 장비 등 국산 소부장 기술의 퀄리티 테스트 통과 잇따라",
+            "글로벌 반도체 메이커 공급망 다변화 정책과 맞물려 해외 수출 본격화",
+            "국내 부품·장비 독자 기술 확보로 반도체 자립도 상승"
+          ],
+          sourceUrl: "https://www.donga.com",
+          tag: "소부장 / 공급망"
+        }
+      ]
+    },
+    etnews: {
+      pressName: "전자신문",
+      badgeColor: "#00838f",
+      articles: [
+        {
+          id: "etnews_1",
+          title: "SK하이닉스, 2분기 사상 최대 실적 달성… HBM 수율 90% 돌파",
+          date: "2026.08.01",
+          reporter: "전자부 김영준 기자",
+          summaryPoints: [
+            "AI 인프라 수요 폭발로 2분기 매출 및 영업이익 사상 최대 기록 경신",
+            "어드밴스드 MR-MUF 공정 안정화로 차세대 HBM 수율 90% 이상 조기 달성",
+            "하반기 HBM4 양산 가속화 및 차세대 CXL 기술 선도로 시장 지배력 강화"
+          ],
+          sourceUrl: "https://www.etnews.com",
+          tag: "실적갱신 / HBM"
+        },
+        {
+          id: "etnews_2",
+          title: "High-NA EUV 노광 장비 2나노 양산 라인 배치 완료… 수율 안정화",
+          date: "2026.07.26",
+          reporter: "반도체전문 박동식 기자",
+          summaryPoints: [
+            "렌즈 개구수 0.55 사양의 차세대 High-NA EUV 노광 팹 설치 및 세팅 완료",
+            "2나노 이하 첨단 로직 및 D램 미세 패턴 형성 기술 격차 도약",
+            "글로벌 장비 제조사와의 밀착 기술 지원으로 수율 안정을 위한 R&D 집약"
+          ],
+          sourceUrl: "https://www.etnews.com",
+          tag: "High-NA EUV"
+        },
+        {
+          id: "etnews_3",
+          title: "메모리 3사, 차세대 LPDDR5X 및 GDDR7 수주 경쟁 격화",
+          date: "2026.07.19",
+          reporter: "부품이슈 강해령 기자",
+          summaryPoints: [
+            "온디바이스 AI 스마트폰 및 고성능 그래픽 카드를 겨냥한 고속 메모리 출시 잇따라",
+            "LPDDR5X 초저전력 동작 구현 및 GDDR7 대역폭 극대화 기술 공개",
+            "글로벌 모바일 AP 및 GPU 제조사 대상 인증 공급 물량 확보 치열"
+          ],
+          sourceUrl: "https://www.etnews.com",
+          tag: "GDDR7 / LPDDR5X"
+        },
+        {
+          id: "etnews_4",
+          title: "AI NPU 전용 테스트 장비 국산화 성공… 테스트 비용 40% 절감",
+          date: "2026.07.12",
+          reporter: "장비재료 윤건일 기자",
+          summaryPoints: [
+            "국내 반도체 테스트 장비업체가 NPU 전용 고속 병열 검사 장비 국산화에 성공",
+            "웨이퍼 단 및 최종 패키지 테스트 시간 및 비용을 40% 절감하는 효과 달성",
+            "글로벌 OSAT 외주 테스트 생태계 공급망 진입 개시"
+          ],
+          sourceUrl: "https://www.etnews.com",
+          tag: "테스트 / 국산화"
+        },
+        {
+          id: "etnews_5",
+          title: "차세대 CXL 메모리 모듈 표준화 작업… 서버용 메모리 생태계 개막",
+          date: "2026.07.05",
+          reporter: "컴퓨팅부 배옥진 기자",
+          summaryPoints: [
+            "CXL(Compute Express Link) 3.0 상용화에 맞춘 차세대 메모리 모듈 국제 표준 확립",
+            "서버 D램 용량 확장 및 메인 메모리 풀링 기술 적용으로 데이터센터 효율화",
+            "국내 메모리 제조사 및 컨트롤러 팹리스의 글로벌 시장 점유율 확대 기대"
+          ],
+          sourceUrl: "https://www.etnews.com",
+          tag: "CXL / 서버모듈"
         }
       ]
     }
