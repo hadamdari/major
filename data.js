@@ -540,13 +540,15 @@ const DataStore = {
         pressNews: localData.pressNews
       };
 
-      if (creatorRes && creatorRes.data) {
+      if (creatorRes && creatorRes.data && creatorRes.data.name && !creatorRes.data.name.includes("Kim Semi") && !creatorRes.data.name.includes("김반도")) {
         result.creator = {
           name: creatorRes.data.name,
           phone: creatorRes.data.phone,
           email: creatorRes.data.email,
           bio: creatorRes.data.bio
         };
+      } else {
+        result.creator = JSON.parse(JSON.stringify(DEFAULT_DATA.creator));
       }
 
       if (glossaryRes && glossaryRes.data && glossaryRes.data.length > 0) {
