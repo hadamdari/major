@@ -282,7 +282,7 @@ function initContactForm() {
     };
 
     const SERVICE_ID = "service_aluct4d";
-    const TEMPLATE_ID = "template_1x0ku4w";
+    const TEMPLATE_ID = "template_5evf61k";
 
     if (typeof emailjs !== 'undefined') {
       emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams)
