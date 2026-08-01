@@ -541,23 +541,53 @@ body {
   color: var(--text-muted);
 }
 
+/* Topic Chip Buttons */
+.topic-chips-wrapper {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.8rem;
+}
+
+.topic-chip-btn {
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.topic-chip-btn:hover,
+.topic-chip-btn.active {
+  background: var(--secondary);
+  color: #fff;
+  border-color: var(--secondary);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.25);
+}
+
 /* Trends Section (News Tabs) */
 .news-tabs {
   display: flex;
   justify-content: center;
-  gap: 1rem;
-  margin-bottom: 2.5rem;
+  gap: 0.8rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
 }
 
 .tab-btn {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.8rem 1.8rem;
+  padding: 0.7rem 1.4rem;
   border-radius: var(--radius-full);
   border: 1px solid var(--border-color);
   background: var(--bg-card);
-  font-size: 1rem;
+  font-size: 0.92rem;
   font-weight: 600;
   color: var(--text-muted);
   cursor: pointer;
@@ -608,14 +638,27 @@ body {
   margin-bottom: 0.8rem;
   font-size: 0.82rem;
   color: var(--text-light);
+  flex-wrap: wrap;
+  gap: 0.4rem;
 }
 
 .news-tag {
   padding: 0.2rem 0.6rem;
   border-radius: var(--radius-sm);
-  background: var(--bg-secondary);
+  background: var(--bg-accent-soft);
   color: var(--primary-hover);
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 0.78rem;
+}
+
+.news-press-name {
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.news-date-info {
+  font-size: 0.78rem;
+  color: var(--text-muted);
 }
 
 .news-title {
