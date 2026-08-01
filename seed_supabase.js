@@ -1,7 +1,7 @@
 const https = require('https');
 
-const SUPABASE_URL = 'dqkqtchntfyvlprdwkga.supabase.co';
-const API_KEY = 'sb_publishable_qP6VFQzzl94PGrQLpZ6AUQ_4ltFj48m';
+const SUPABASE_URL = 'iyxhggebuvzilikzvugy.supabase.co';
+const API_KEY = 'sb_publishable_Cb3AnfTOvwg8ugAec8QKRg_R3AUxDZl';
 
 // 1. 50개 용어 사전 데이터
 const glossaryData = [

@@ -4,11 +4,15 @@
 
 const SUPABASE_URL = (typeof window !== 'undefined' && window.ENV && window.ENV.SUPABASE_URL)
   ? window.ENV.SUPABASE_URL
-  : 'https://dqkqtchntfyvlprdwkga.supabase.co';
+  : (typeof process !== 'undefined' && process.env && (process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL))
+    ? (process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL)
+    : 'https://iyxhggebuvzilikzvugy.supabase.co';
 
 const SUPABASE_ANON_KEY = (typeof window !== 'undefined' && window.ENV && window.ENV.SUPABASE_ANON_KEY)
   ? window.ENV.SUPABASE_ANON_KEY
-  : 'sb_publishable_qP6VFQzzl94PGrQLpZ6AUQ_4ltFj48m';
+  : (typeof process !== 'undefined' && process.env && (process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY))
+    ? (process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY)
+    : 'sb_publishable_Cb3AnfTOvwg8ugAec8QKRg_R3AUxDZl';
 
 let supabase = null;
 try {
@@ -522,11 +526,11 @@ const DataStore = {
 
     try {
       const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("Supabase response timeout")), 2000)
+        setTimeout(() => reject(new Error("Supabase response timeout")), 6000)
       );
 
       const fetchPromise = Promise.all([
-        supabase.from('creator_profile').select('*').single(),
+        supabase.from('creator_profile').select('*').limit(1),
         supabase.from('glossary').select('*').order('created_at', { ascending: false }),
         supabase.from('press_news').select('*').order('created_at', { ascending: false })
       ]);
@@ -540,65 +544,64 @@ const DataStore = {
         pressNews: localData.pressNews
       };
 
-      if (creatorRes && creatorRes.data && creatorRes.data.name && !creatorRes.data.name.includes("Kim Semi") && !creatorRes.data.name.includes("김반도")) {
+      // 1. 프로필 정보 Supabase 동기화
+      if (creatorRes && creatorRes.data && creatorRes.data.length > 0 && creatorRes.data[0].name) {
+        const cData = creatorRes.data[0];
         result.creator = {
-          name: creatorRes.data.name,
-          phone: creatorRes.data.phone,
-          email: creatorRes.data.email,
-          bio: creatorRes.data.bio
+          name: cData.name,
+          phone: cData.phone || '',
+          email: cData.email || '',
+          bio: cData.bio || ''
         };
-      } else {
-        result.creator = JSON.parse(JSON.stringify(DEFAULT_DATA.creator));
       }
 
+      // 2. 용어 사전 Supabase 동기화
       if (glossaryRes && glossaryRes.data && glossaryRes.data.length > 0) {
-        const supGlossaryMap = new Map(glossaryRes.data.map(g => [g.id || g.term, {
+        result.glossary = glossaryRes.data.map(g => ({
           id: g.id,
           term: g.term,
           category: g.category,
           definition: g.definition
-        }]));
-
-        const mergedGlossary = JSON.parse(JSON.stringify(DEFAULT_DATA.glossary));
-        mergedGlossary.forEach((item, index) => {
-          if (supGlossaryMap.has(item.id)) {
-            mergedGlossary[index] = supGlossaryMap.get(item.id);
-            supGlossaryMap.delete(item.id);
-          }
-        });
-        supGlossaryMap.forEach(v => mergedGlossary.push(v));
-        result.glossary = mergedGlossary;
+        }));
       }
 
+      // 3. 동향 기사(작업물) Supabase 동기화
       if (newsRes && newsRes.data && newsRes.data.length > 0) {
         const pressObj = JSON.parse(JSON.stringify(DEFAULT_DATA.pressNews));
-
-        const existingIds = new Set();
-        Object.keys(pressObj).forEach(k => {
-          if (pressObj[k] && pressObj[k].articles) {
-            pressObj[k].articles.forEach(a => existingIds.add(a.id));
-          }
-        });
 
         newsRes.data.forEach(item => {
           const key = item.press_key;
           if (!pressObj[key]) {
-            pressObj[key] = { pressName: item.press_name || key, articles: [] };
+            pressObj[key] = { pressName: item.press_name || key, badgeColor: "#0284c7", articles: [] };
           }
-          if (!existingIds.has(item.id)) {
+          const summaryArr = Array.isArray(item.summary_points) 
+            ? item.summary_points 
+            : (typeof item.summary_points === 'string' ? JSON.parse(item.summary_points || '[]') : []);
+          
+          const exists = pressObj[key].articles.some(a => a.id === item.id);
+          if (!exists) {
             pressObj[key].articles.push({
               id: item.id,
               title: item.title,
               date: item.date,
               reporter: item.reporter,
-              summaryPoints: Array.isArray(item.summary_points) ? item.summary_points : (JSON.parse(item.summary_points || '[]')),
+              summaryPoints: summaryArr,
               sourceUrl: item.source_url,
               tag: item.tag
             });
-            existingIds.add(item.id);
           }
         });
         result.pressNews = pressObj;
+      }
+
+      // 4. 테이블에 데이터가 없는 경우 자동으로 샘플 데이터 시딩(Auto-Seed)
+      const isCreatorEmpty = !creatorRes || !creatorRes.data || creatorRes.data.length === 0;
+      const isGlossaryEmpty = !glossaryRes || !glossaryRes.data || glossaryRes.data.length === 0;
+      const isNewsEmpty = !newsRes || !newsRes.data || newsRes.data.length === 0;
+
+      if (isCreatorEmpty || isGlossaryEmpty || isNewsEmpty) {
+        console.log("Supabase tables are empty. Auto-seeding default data to Supabase...");
+        await this.seedToSupabase(DEFAULT_DATA);
       }
 
       const safeResult = this.ensureDefaults(result);
@@ -609,6 +612,63 @@ const DataStore = {
     } catch (e) {
       console.warn("Supabase load fallback used:", e.message);
       return localData;
+    }
+  },
+
+  async seedToSupabase(sourceData) {
+    if (!supabase) return;
+    const dataToSeed = sourceData || DEFAULT_DATA;
+    try {
+      // 1. 프로필 시딩
+      if (dataToSeed.creator) {
+        await supabase.from('creator_profile').upsert({
+          id: 1,
+          name: dataToSeed.creator.name,
+          phone: dataToSeed.creator.phone,
+          email: dataToSeed.creator.email,
+          bio: dataToSeed.creator.bio
+        });
+      }
+
+      // 2. 용어 사전 시딩 (배치 upsert)
+      if (Array.isArray(dataToSeed.glossary) && dataToSeed.glossary.length > 0) {
+        const glossaryRows = dataToSeed.glossary.map(g => ({
+          id: g.id,
+          term: g.term,
+          category: g.category,
+          definition: g.definition
+        }));
+        await supabase.from('glossary').upsert(glossaryRows);
+      }
+
+      // 3. 기사 동향 시딩 (배치 upsert)
+      if (dataToSeed.pressNews) {
+        const newsRows = [];
+        Object.keys(dataToSeed.pressNews).forEach(pressKey => {
+          const press = dataToSeed.pressNews[pressKey];
+          if (press && Array.isArray(press.articles)) {
+            press.articles.forEach(art => {
+              newsRows.push({
+                id: art.id,
+                press_key: pressKey,
+                press_name: press.pressName || pressKey,
+                title: art.title,
+                date: art.date,
+                reporter: art.reporter,
+                summary_points: art.summaryPoints,
+                source_url: art.sourceUrl,
+                tag: art.tag
+              });
+            });
+          }
+        });
+        if (newsRows.length > 0) {
+          await supabase.from('press_news').upsert(newsRows);
+        }
+      }
+      console.log("Supabase Auto-Seeding completed successfully.");
+    } catch (err) {
+      console.error("Supabase Seeding error:", err);
     }
   },
 
@@ -670,7 +730,7 @@ const DataStore = {
 
     if (supabase) {
       try {
-        await supabase.from('glossary').insert([{
+        await supabase.from('glossary').upsert([{
           id: item.id,
           term: item.term,
           category: item.category,
@@ -708,7 +768,7 @@ const DataStore = {
 
     if (supabase) {
       try {
-        await supabase.from('press_news').insert([{
+        await supabase.from('press_news').upsert([{
           id: article.id,
           press_key: pressKey,
           press_name: current.pressNews[pressKey]?.pressName || pressKey,
@@ -765,10 +825,13 @@ const DataStore = {
     }
   },
 
-  resetData() {
+  async resetData() {
     const initial = JSON.parse(JSON.stringify(DEFAULT_DATA));
     this.saveLocalData(initial);
     this.cache = initial;
+    if (supabase) {
+      await this.seedToSupabase(initial);
+    }
     return initial;
   },
 

@@ -286,9 +286,23 @@ function initContactForm() {
       to_email: "kjk09002@gmail.com"
     };
 
-    const SERVICE_ID = "service_aluct4d";
-    const TEMPLATE_ID = "template_5evf61k";
-    const PUBLIC_KEY = "a-jC2llJwd0O5xSSJ";
+    const SERVICE_ID = (typeof window !== 'undefined' && window.ENV && window.ENV.EMAILJS_SERVICE_ID)
+      ? window.ENV.EMAILJS_SERVICE_ID
+      : (typeof process !== 'undefined' && process.env && (process.env.EMAILJS_SERVICE_ID || process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || process.env.VITE_EMAILJS_SERVICE_ID))
+        ? (process.env.EMAILJS_SERVICE_ID || process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || process.env.VITE_EMAILJS_SERVICE_ID)
+        : "service_aluct4d";
+
+    const TEMPLATE_ID = (typeof window !== 'undefined' && window.ENV && window.ENV.EMAILJS_TEMPLATE_ID)
+      ? window.ENV.EMAILJS_TEMPLATE_ID
+      : (typeof process !== 'undefined' && process.env && (process.env.EMAILJS_TEMPLATE_ID || process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || process.env.VITE_EMAILJS_TEMPLATE_ID))
+        ? (process.env.EMAILJS_TEMPLATE_ID || process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || process.env.VITE_EMAILJS_TEMPLATE_ID)
+        : "template_5evf61k";
+
+    const PUBLIC_KEY = (typeof window !== 'undefined' && window.ENV && window.ENV.EMAILJS_PUBLIC_KEY)
+      ? window.ENV.EMAILJS_PUBLIC_KEY
+      : (typeof process !== 'undefined' && process.env && (process.env.EMAILJS_PUBLIC_KEY || process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || process.env.VITE_EMAILJS_PUBLIC_KEY))
+        ? (process.env.EMAILJS_PUBLIC_KEY || process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || process.env.VITE_EMAILJS_PUBLIC_KEY)
+        : "a-jC2llJwd0O5xSSJ";
 
     if (typeof emailjs !== 'undefined') {
       emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, PUBLIC_KEY)
@@ -750,7 +764,7 @@ function initAdminBackupForm() {
   if (resetBtn) {
     resetBtn.addEventListener('click', async () => {
       if (confirm('기본 샘플 데이터로 복구하시겠습니까? 기존 변경사항이 초기화됩니다.')) {
-        getStore().resetData();
+        await getStore().resetData();
         await renderApp();
         openAdminDashboard();
         if (typeof Swal !== 'undefined') {
