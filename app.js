@@ -43,7 +43,7 @@ async function renderApp() {
   renderCreatorProfile(storeData.creator);
   renderConcepts(storeData.concepts);
   renderGlossaryList(storeData.glossary);
-  renderNewsList();
+  renderNewsList(storeData.pressNews);
 }
 
 function renderCreatorProfile(creator) {
@@ -175,11 +175,11 @@ function initGlossarySearch() {
 // 5. 동향 기사 탭 제어
 let currentPressKey = 'chosun';
 
-function renderNewsList() {
+function renderNewsList(pressNewsData) {
   const tabsContainer = document.getElementById('news-tabs-container');
   const newsGrid = document.getElementById('news-grid-container');
   const storeData = getStore().getData();
-  const pressNews = storeData.pressNews;
+  const pressNews = pressNewsData || storeData.pressNews || DEFAULT_DATA.pressNews;
 
   if (!tabsContainer || !newsGrid || !pressNews) return;
 
