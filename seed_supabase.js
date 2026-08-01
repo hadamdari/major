@@ -57,8 +57,9 @@ const glossaryData = [
   { id: "g50", term: "온디바이스 AI (On-device AI)", category: "응용기술", definition: "외부 클라우드 연결 없이 스마트폰·차량 단말기 자체 칩(NPU)에서 실시간 인공지능을 수행하는 기술." }
 ];
 
-// 2. 5개 최신 동향 기사 링크 데이터
+// 2. 15개 최신 동향 기사 데이터 (신문사별 5개씩)
 const newsData = [
+  // 조선일보 (5개)
   {
     id: "real_n1",
     press_key: "chosun",
@@ -90,6 +91,53 @@ const newsData = [
     tag: "글로벌 동향"
   },
   {
+    id: "real_n1_3",
+    press_key: "chosun",
+    press_name: "조선일보",
+    title: "EUV 노광장비 도입 가속화… 차세대 2나노 미세공정 주도권 다툼",
+    date: "2026.07.26",
+    reporter: "산업부 김민철 기자",
+    summary_points: [
+      "차세대 2나노 공정 양산을 앞두고 High-NA EUV 노광 장비 확보 경쟁 본격화",
+      "파운드리 및 최첨단 DRAM 노광 라인 수율 안정을 위한 미세패턴 기술 집약",
+      "글로벌 반도체 팹의 생산 라인 고도화에 따른 소부장 협력사 수주 모멘텀 확대"
+    ],
+    source_url: "https://www.chosun.com",
+    tag: "EUV / 미세공정"
+  },
+  {
+    id: "real_n1_4",
+    press_key: "chosun",
+    press_name: "조선일보",
+    title: "ASML, 한국 R&D 트레이닝 센터 오픈… 국산 소부장 생태계 강화",
+    date: "2026.07.20",
+    reporter: "테크이슈부 이윤정 기자",
+    summary_points: [
+      "세계적인 노광 장비 기업 ASML이 한국 재제조 및 트레이닝 센터 완공식 개최",
+      "국내 주요 반도체 제조사와의 원스톱 기술 지원 시스템 및 엔지니어 육성 기반 마련",
+      "소부장(소재·부품·장비) 국내 공급망 안정화와 클러스터 구축 가속화 기대"
+    ],
+    source_url: "https://www.chosun.com",
+    tag: "장비 / 클러스터"
+  },
+  {
+    id: "real_n1_5",
+    press_key: "chosun",
+    press_name: "조선일보",
+    title: "미국 반도체 보조금 2차 집행… 테일러·피닉스 공장 가동률 점검",
+    date: "2026.07.15",
+    reporter: "워싱턴 특파원 강인선 기자",
+    summary_points: [
+      "미국 상무부가 글로벌 반도체 메이커를 대상으로 2차 현금 보조금 집행 개시",
+      "텍사스 테일러 파운드리 공장 및 아리조나 팹의 연말 시험 가동 준비 순항",
+      "글로벌 지정학적 리스크 관리와 북미 고객사 밀착 대응 전략 고도화"
+    ],
+    source_url: "https://www.chosun.com",
+    tag: "글로벌 보조금"
+  },
+
+  // 매일경제 (5개)
+  {
     id: "real_n3",
     press_key: "mk",
     press_name: "매일경제",
@@ -120,6 +168,53 @@ const newsData = [
     tag: "메모리 수급"
   },
   {
+    id: "real_n2_3",
+    press_key: "mk",
+    press_name: "매일경제",
+    title: "SK하이닉스, MR-MUF 5세대 기술 완성… HBM4E 수율 90% 달성",
+    date: "2026.07.25",
+    reporter: "벤처기업부 성승훈 기자",
+    summary_points: [
+      "어드밴스드 MR-MUF 후공정 기술 고도화로 HBM4E 양산 수율 90% 안정적 조기 확보",
+      "열 방출 특성과 칩 뒤틀림 방지 성능을 비약적으로 끌어올린 패키징 경쟁력 입증",
+      "글로벌 AI 가속기 독점 공급망에서의 독보적 지위 지속 유지"
+    ],
+    source_url: "https://www.mk.co.kr",
+    tag: "HBM4E / MR-MUF"
+  },
+  {
+    id: "real_n2_4",
+    press_key: "mk",
+    press_name: "매일경제",
+    title: "CXL 3.0 상용화 물결… 서버 D램 용량 4배 확장 시대 열린다",
+    date: "2026.07.18",
+    reporter: "금융부 김정환 기자",
+    summary_points: [
+      "CXL(Compute Express Link) 3.0 스펙을 탑재한 차세대 서버 플랫폼 가동 본격화",
+      "메모리 풀링(Pooling) 기술 적용으로 데이터센터 서버 운용 비용(TCO) 30% 절감 효과",
+      "CXL 컨트롤러 및 차세대 메모리 모듈 관련 기업들의 매출 본격 가시화"
+    ],
+    source_url: "https://www.mk.co.kr",
+    tag: "CXL 3.0 / 서버"
+  },
+  {
+    id: "real_n2_5",
+    press_key: "mk",
+    press_name: "매일경제",
+    title: "온디바이스 AI 칩 탑재 프리미엄 스마트폰·노트북 출하량 급증",
+    date: "2026.07.12",
+    reporter: "모바일이슈부 이상규 기자",
+    summary_points: [
+      "NPU 성능이 끌어올려진 모바일 AP와 고속 LPDDR5X 메모리 탑재 비중 증대",
+      "클라우드 없는 인터넷 오프라인 상태에서의 실시간 통번역 및 생성형 AI 기능 대중화",
+      "글로벌 스마트폰 제조사들의 온디바이스 AI 마케팅 치열"
+    ],
+    source_url: "https://www.mk.co.kr",
+    tag: "온디바이스 AI"
+  },
+
+  // 한국경제 (5개)
+  {
     id: "real_n5",
     press_key: "hankyung",
     press_name: "한국경제",
@@ -133,6 +228,66 @@ const newsData = [
     ],
     source_url: "https://www.hankyung.com",
     tag: "실적 분석"
+  },
+  {
+    id: "real_n6",
+    press_key: "hankyung",
+    press_name: "한국경제",
+    title: "SK하이닉스·삼성전자 HBM 기술 주도권 싸움… 2026년 하반기 승부처",
+    date: "2026.07.25",
+    reporter: "산업부 황정수 기자",
+    summary_points: [
+      "AI 가속기 시장 팽창에 따라 차세대 HBM 수주를 둘러싼 국내 양대 반도체 공룡의 경쟁 심화",
+      "MR-MUF 대 NCF 첨단 패키징 공정 방식과 파운드리 우군 확보가 승패 가를 열쇠",
+      "온디바이스 AI 시장 확대에 대응하는 NPU 및 LPDDR5X 메모리 라인 증설 활발"
+    ],
+    source_url: "https://www.hankyung.com",
+    tag: "HBM 주도권"
+  },
+  {
+    id: "real_n3_3",
+    press_key: "hankyung",
+    press_name: "한국경제",
+    title: "차세대 반도체 패키징 OSAT 전문 기업 매출 호조… 후공정 밸류체인 주목",
+    date: "2026.07.21",
+    reporter: "증권부 박해린 기자",
+    summary_points: [
+      "칩렛(Chiplet) 및 2.5D/3D 첨단 패키징 외주 물량 급증으로 국내 OSAT 실적 대폭 향상",
+      "웨이퍼 단에서 패키징을 마치는 FOWLP 기술 적용 범주 확장",
+      "글로벌 반도체 공급망 재편 속에서 후공정 검사 및 조립 생태계 부각"
+    ],
+    source_url: "https://www.hankyung.com",
+    tag: "OSAT / 패키징"
+  },
+  {
+    id: "real_n3_4",
+    press_key: "hankyung",
+    press_name: "한국경제",
+    title: "전력 반도체 SiC·GaN 시장 성장세… 전기차 및 인버터 탑재 확대",
+    date: "2026.07.14",
+    reporter: "IT·바이오부 남정석 기자",
+    summary_points: [
+      "탄화규소(SiC) 및 질화갈륨(GaN) 화합물 전력 반도체의 높은 고전압·고온 효율성 주목",
+      "전기차 구동 인버터 및 초고속 데이터센터 충전 시스템 적용 비율 연 25% 상승",
+      "국내 전력 반도체 웨이퍼 팹 증설 투자 활발"
+    ],
+    source_url: "https://www.hankyung.com",
+    tag: "전력반도체 / SiC"
+  },
+  {
+    id: "real_n3_5",
+    press_key: "hankyung",
+    press_name: "한국경제",
+    title: "팹리스 스타트업 AI NPU 칩 자체 설계 성과… 투자 유치 가속화",
+    date: "2026.07.08",
+    reporter: "스타트업부 고은이 기자",
+    summary_points: [
+      "국내 팹리스 벤처 기업들이 개발한 저전력 고성능 NPU 칩 테이프아웃(Tape-out) 완료",
+      "글로벌 엑셀러레이터 및 벤처캐피털(VC)로부터 대규모 펀딩 성공",
+      "국내 파운드리 생태계와의 디자인하우스 시너지로 글로벌 시장 진출 가속화"
+    ],
+    source_url: "https://www.hankyung.com",
+    tag: "팹리스 / NPU"
   }
 ];
 

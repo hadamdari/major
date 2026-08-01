@@ -408,32 +408,51 @@ const DataStore = {
       }
 
       if (glossaryRes && glossaryRes.data && glossaryRes.data.length > 0) {
-        result.glossary = glossaryRes.data.map(g => ({
+        const supGlossaryMap = new Map(glossaryRes.data.map(g => [g.id || g.term, {
           id: g.id,
           term: g.term,
           category: g.category,
           definition: g.definition
-        }));
+        }]));
+
+        const mergedGlossary = JSON.parse(JSON.stringify(DEFAULT_DATA.glossary));
+        mergedGlossary.forEach((item, index) => {
+          if (supGlossaryMap.has(item.id)) {
+            mergedGlossary[index] = supGlossaryMap.get(item.id);
+            supGlossaryMap.delete(item.id);
+          }
+        });
+        supGlossaryMap.forEach(v => mergedGlossary.push(v));
+        result.glossary = mergedGlossary;
       }
 
       if (newsRes && newsRes.data && newsRes.data.length > 0) {
-        const pressObj = JSON.parse(JSON.stringify(localData.pressNews || DEFAULT_DATA.pressNews));
-        Object.keys(pressObj).forEach(k => pressObj[k].articles = []);
+        const pressObj = JSON.parse(JSON.stringify(DEFAULT_DATA.pressNews));
+
+        const existingIds = new Set();
+        Object.keys(pressObj).forEach(k => {
+          if (pressObj[k] && pressObj[k].articles) {
+            pressObj[k].articles.forEach(a => existingIds.add(a.id));
+          }
+        });
 
         newsRes.data.forEach(item => {
           const key = item.press_key;
           if (!pressObj[key]) {
             pressObj[key] = { pressName: item.press_name || key, articles: [] };
           }
-          pressObj[key].articles.push({
-            id: item.id,
-            title: item.title,
-            date: item.date,
-            reporter: item.reporter,
-            summaryPoints: Array.isArray(item.summary_points) ? item.summary_points : (JSON.parse(item.summary_points || '[]')),
-            sourceUrl: item.source_url,
-            tag: item.tag
-          });
+          if (!existingIds.has(item.id)) {
+            pressObj[key].articles.push({
+              id: item.id,
+              title: item.title,
+              date: item.date,
+              reporter: item.reporter,
+              summaryPoints: Array.isArray(item.summary_points) ? item.summary_points : (JSON.parse(item.summary_points || '[]')),
+              sourceUrl: item.source_url,
+              tag: item.tag
+            });
+            existingIds.add(item.id);
+          }
         });
         result.pressNews = pressObj;
       }
