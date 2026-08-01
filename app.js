@@ -108,12 +108,59 @@ function initHeroStats() {
   });
 }
 
+let activeConceptCategory = '전체';
+
 function renderConcepts(concepts) {
   const container = document.getElementById('concept-grid-container');
-  if (!container || !concepts) return;
+  const tagsContainer = document.getElementById('concept-tags');
+  const counterEl = document.getElementById('concept-counter');
+  const storeData = getStore().getData();
+  const allConcepts = concepts || storeData.concepts || DEFAULT_DATA.concepts;
 
-  container.innerHTML = concepts.map(item => `
-    <div class="concept-card">
+  if (!container || !allConcepts) return;
+
+  if (counterEl) {
+    counterEl.textContent = allConcepts.length || 8;
+  }
+
+  // Render concept category tags
+  const categories = ['전체', ...new Set(allConcepts.map(c => c.category))];
+  if (tagsContainer) {
+    tagsContainer.innerHTML = categories.map(cat => `
+      <button class="tag-btn ${cat === activeConceptCategory ? 'active' : ''}" data-concept-cat="${cat}">
+        ${cat}
+      </button>
+    `).join('');
+
+    // Attach click handler once or delegate
+    if (!tagsContainer.dataset.initialized) {
+      tagsContainer.dataset.initialized = 'true';
+      tagsContainer.addEventListener('click', (e) => {
+        const btn = e.target.closest('.tag-btn');
+        if (!btn) return;
+        activeConceptCategory = btn.dataset.conceptCat;
+        const freshConcepts = getStore().getData().concepts || DEFAULT_DATA.concepts;
+        renderConcepts(freshConcepts);
+      });
+    }
+  }
+
+  // Filter concepts
+  const filtered = allConcepts.filter(item => {
+    return activeConceptCategory === '전체' || item.category === activeConceptCategory;
+  });
+
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 2.5rem;">
+        🔍 선택된 카테고리에 해당하는 기본 개념이 없습니다.
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = filtered.map(item => `
+    <div class="concept-card" id="concept-card-${item.id}">
       <div class="concept-header">
         <div class="concept-icon">${item.icon}</div>
         <div>
@@ -123,7 +170,7 @@ function renderConcepts(concepts) {
       </div>
       <p class="concept-summary">${item.summary}</p>
       <ul class="concept-details">
-        ${item.details.map(d => `<li>${d}</li>`).join('')}
+        ${(item.details || []).map(d => `<li>${d}</li>`).join('')}
       </ul>
     </div>
   `).join('');
@@ -189,7 +236,7 @@ function initGlossarySearch() {
   if (tagsContainer) {
     tagsContainer.addEventListener('click', (e) => {
       if (!e.target.classList.contains('tag-btn')) return;
-      document.querySelectorAll('.tag-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('#glossary-tags .tag-btn').forEach(b => b.classList.remove('active'));
       e.target.classList.add('active');
       activeCategory = e.target.dataset.cat;
       const glossary = getStore().getData().glossary;
@@ -200,9 +247,34 @@ function initGlossarySearch() {
 
 // 5. 동향 기사 탭 & 검색 제어
 let currentPressKey = 'all';
+let selectedTopicChip = '전체';
 let newsSearchQuery = '';
 
+const TOPIC_CHIPS = ['전체', 'AI반도체', 'HBM', '2나노', 'EUV', '파운드리', '온디바이스', 'CXL', '패키징'];
+
+function renderNewsTopicChips() {
+  const chipsContainer = document.getElementById('news-topic-chips');
+  if (!chipsContainer) return;
+
+  chipsContainer.innerHTML = TOPIC_CHIPS.map(topic => `
+    <button class="topic-chip-btn ${topic === selectedTopicChip ? 'active' : ''}" data-topic="${topic}">
+      ${topic === '전체' ? '🔥 전체 이슈' : `#${topic}`}
+    </button>
+  `).join('');
+
+  if (!chipsContainer.dataset.initialized) {
+    chipsContainer.dataset.initialized = 'true';
+    chipsContainer.addEventListener('click', (e) => {
+      const btn = e.target.closest('.topic-chip-btn');
+      if (!btn) return;
+      selectedTopicChip = btn.dataset.topic;
+      renderNewsList();
+    });
+  }
+}
+
 function renderNewsList(pressNewsData) {
+  renderNewsTopicChips();
   const tabsContainer = document.getElementById('news-tabs-container');
   const newsGrid = document.getElementById('news-grid-container');
   const storeData = getStore().getData();
@@ -216,10 +288,10 @@ function renderNewsList(pressNewsData) {
     return;
   }
 
-  // Build tab buttons (including '전체 보기')
+  // Build tab buttons (including '전체 기사 스크랩')
   let tabHtml = `
     <button class="tab-btn ${currentPressKey === 'all' ? 'active' : ''}" data-press="all">
-      <span><i class="fa-solid fa-list-check"></i></span> 전체 기사 스크랩
+      <span><i class="fa-solid fa-layer-group"></i></span> 전체 스크랩
     </button>
   `;
 
@@ -235,7 +307,7 @@ function renderNewsList(pressNewsData) {
 
   tabsContainer.innerHTML = tabHtml;
 
-  // Gather articles depending on selected tab
+  // Gather articles depending on selected press tab
   let articlesToDisplay = [];
   if (currentPressKey === 'all') {
     pressKeys.forEach(key => {
@@ -251,7 +323,17 @@ function renderNewsList(pressNewsData) {
     articlesToDisplay = press.articles.map(art => ({ ...art, pressName: press.pressName || currentPressKey }));
   }
 
-  // Apply real-time search filter
+  // Apply Topic Chip Filter
+  if (selectedTopicChip !== '전체') {
+    const topic = selectedTopicChip.toLowerCase();
+    articlesToDisplay = articlesToDisplay.filter(a => {
+      return (a.tag && a.tag.toLowerCase().includes(topic)) ||
+             (a.title && a.title.toLowerCase().includes(topic)) ||
+             (a.summaryPoints && a.summaryPoints.some(sp => sp.toLowerCase().includes(topic)));
+    });
+  }
+
+  // Apply real-time search input filter
   if (newsSearchQuery) {
     const q = newsSearchQuery.toLowerCase();
     articlesToDisplay = articlesToDisplay.filter(a => {
@@ -265,8 +347,10 @@ function renderNewsList(pressNewsData) {
 
   if (articlesToDisplay.length === 0) {
     newsGrid.innerHTML = `
-      <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 3rem;">
-        🔍 검색 조건 또는 해당 탭에 등록된 동향 기사 스크랩이 없습니다.
+      <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 3.5rem; background: var(--bg-card); border-radius: var(--radius-lg); border: 1px dashed var(--border-color);">
+        <div style="font-size: 2.2rem; margin-bottom: 0.8rem;">🔍</div>
+        <h4 style="font-size: 1.1rem; color: var(--secondary); margin-bottom: 0.4rem;">검색된 기사 스크랩이 없습니다</h4>
+        <p style="font-size: 0.9rem; color: var(--text-muted);">다른 토픽 칩이나 키워드를 검색해 보세요.</p>
       </div>
     `;
     return;
@@ -276,18 +360,18 @@ function renderNewsList(pressNewsData) {
     <div class="news-card">
       <div class="news-meta">
         <span class="news-tag">${article.tag}</span>
-        <span style="font-weight: 600; color: var(--primary);">[${article.pressName}]</span>
-        <span>📅 ${article.date} | ${article.reporter}</span>
+        <span class="news-press-name">[${article.pressName}]</span>
+        <span class="news-date-info"><i class="fa-regular fa-clock"></i> ${article.date} | ${article.reporter}</span>
       </div>
       <h3 class="news-title">${article.title}</h3>
       <div class="summary-box">
-        <h5>💡 초보자용 핵심 3줄 요약</h5>
+        <h5><i class="fa-solid fa-lightbulb"></i> 권지연 연구원의 3줄 요약</h5>
         <ul class="summary-list">
           ${(article.summaryPoints || []).map(point => `<li>${point}</li>`).join('')}
         </ul>
       </div>
       <a href="${article.sourceUrl}" target="_blank" rel="noopener noreferrer" class="news-link-btn">
-        원문 기사 보러가기 <i class="fa-solid fa-arrow-right"></i>
+        원문 기사 보러가기 <i class="fa-solid fa-arrow-up-right-from-square"></i>
       </a>
     </div>
   `).join('');
