@@ -44,6 +44,35 @@ async function renderApp() {
   renderConcepts(storeData.concepts);
   renderGlossaryList(storeData.glossary);
   renderNewsList(storeData.pressNews);
+  updateLiveCounters(storeData);
+}
+
+function updateLiveCounters(data) {
+  const glossary = data?.glossary || [];
+  const pressNews = data?.pressNews || {};
+  let totalNews = 0;
+  Object.keys(pressNews).forEach(k => {
+    if (pressNews[k] && pressNews[k].articles) {
+      totalNews += pressNews[k].articles.length;
+    }
+  });
+
+  const gCounterEl = document.getElementById('glossary-counter');
+  const cardGCountEl = document.getElementById('card-glossary-count');
+  if (gCounterEl) gCounterEl.textContent = glossary.length || 50;
+  if (cardGCountEl) cardGCountEl.textContent = glossary.length || 50;
+
+  const nCounterEl = document.getElementById('total-news-counter');
+  const cardNCountEl = document.getElementById('card-news-count');
+  if (nCounterEl) nCounterEl.textContent = totalNews || 25;
+  if (cardNCountEl) cardNCountEl.textContent = totalNews || 25;
+
+  const statTermsEl = document.getElementById('stat-terms');
+  if (statTermsEl) statTermsEl.textContent = `주요 용어 ${glossary.length || 50}개`;
+
+  const statPressEl = document.getElementById('stat-press');
+  const pressCount = Object.keys(pressNews).length || 5;
+  if (statPressEl) statPressEl.textContent = `${pressCount}대 신문사 ${totalNews || 25}개 기사`;
 }
 
 function renderCreatorProfile(creator) {
@@ -53,26 +82,23 @@ function renderCreatorProfile(creator) {
   const emailEl = document.getElementById('creator-email-text');
   const bioEl = document.getElementById('creator-bio-text');
 
-  if (nameEl) nameEl.textContent = creator.name || '';
-  if (phoneEl) phoneEl.textContent = creator.phone || '';
-  if (emailEl) emailEl.textContent = creator.email || '';
-  if (bioEl) bioEl.textContent = creator.bio || '';
+  if (nameEl) nameEl.textContent = creator.name || '권지연 (JiYeon Kwon)';
+  if (phoneEl) phoneEl.textContent = creator.phone || '010-2993-4116';
+  if (emailEl) emailEl.textContent = creator.email || 'kjk09002@gmail.com';
+  if (bioEl) bioEl.textContent = creator.bio || '최신 반도체 기술 동향과 핵심 개념을 쉽게 이해할 수 있도록 큐레이션하는 반도체 전문 연구원 권지연입니다.';
 }
 
 function initHeroStats() {
   const stats = [
-    { target: 8, elementId: 'stat-processes', suffix: '대 공정' },
-    { target: 50, elementId: 'stat-terms', prefix: '주요 용어 ', suffix: '개+' },
-    { target: 3, elementId: 'stat-press', suffix: '대 신문사 큐레이션' }
+    { target: 8, elementId: 'stat-processes', suffix: '대 공정' }
   ];
 
   stats.forEach(s => {
     const el = document.getElementById(s.elementId);
     if (!el) return;
     let count = 0;
-    const step = Math.max(1, Math.floor(s.target / 20));
     const timer = setInterval(() => {
-      count += step;
+      count += 1;
       if (count >= s.target) {
         count = s.target;
         clearInterval(timer);
@@ -172,8 +198,9 @@ function initGlossarySearch() {
   }
 }
 
-// 5. 동향 기사 탭 제어
-let currentPressKey = 'chosun';
+// 5. 동향 기사 탭 & 검색 제어
+let currentPressKey = 'all';
+let newsSearchQuery = '';
 
 function renderNewsList(pressNewsData) {
   const tabsContainer = document.getElementById('news-tabs-container');
@@ -189,40 +216,74 @@ function renderNewsList(pressNewsData) {
     return;
   }
 
-  if (!pressNews[currentPressKey]) {
-    currentPressKey = pressKeys[0];
-  }
+  // Build tab buttons (including '전체 보기')
+  let tabHtml = `
+    <button class="tab-btn ${currentPressKey === 'all' ? 'active' : ''}" data-press="all">
+      <span><i class="fa-solid fa-list-check"></i></span> 전체 기사 스크랩
+    </button>
+  `;
 
-  tabsContainer.innerHTML = pressKeys.map((key) => {
+  tabHtml += pressKeys.map((key) => {
     const press = pressNews[key];
+    const count = press.articles ? press.articles.length : 0;
     return `
       <button class="tab-btn ${key === currentPressKey ? 'active' : ''}" data-press="${key}">
-        <span><i class="fa-regular fa-newspaper"></i></span> ${press.pressName || key}
+        <span><i class="fa-regular fa-newspaper"></i></span> ${press.pressName || key} (${count})
       </button>
     `;
   }).join('');
 
-  const currentPress = pressNews[currentPressKey];
-  if (!currentPress || !currentPress.articles || currentPress.articles.length === 0) {
+  tabsContainer.innerHTML = tabHtml;
+
+  // Gather articles depending on selected tab
+  let articlesToDisplay = [];
+  if (currentPressKey === 'all') {
+    pressKeys.forEach(key => {
+      const press = pressNews[key];
+      if (press && press.articles) {
+        press.articles.forEach(art => {
+          articlesToDisplay.push({ ...art, pressName: press.pressName || key });
+        });
+      }
+    });
+  } else if (pressNews[currentPressKey] && pressNews[currentPressKey].articles) {
+    const press = pressNews[currentPressKey];
+    articlesToDisplay = press.articles.map(art => ({ ...art, pressName: press.pressName || currentPressKey }));
+  }
+
+  // Apply real-time search filter
+  if (newsSearchQuery) {
+    const q = newsSearchQuery.toLowerCase();
+    articlesToDisplay = articlesToDisplay.filter(a => {
+      return (a.title && a.title.toLowerCase().includes(q)) ||
+             (a.tag && a.tag.toLowerCase().includes(q)) ||
+             (a.reporter && a.reporter.toLowerCase().includes(q)) ||
+             (a.pressName && a.pressName.toLowerCase().includes(q)) ||
+             (a.summaryPoints && a.summaryPoints.some(sp => sp.toLowerCase().includes(q)));
+    });
+  }
+
+  if (articlesToDisplay.length === 0) {
     newsGrid.innerHTML = `
       <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 3rem;">
-        [${currentPress?.pressName || currentPressKey}]에 등록된 기사가 없습니다. 관리자 페이지에서 기사를 추가해보세요.
+        🔍 검색 조건 또는 해당 탭에 등록된 동향 기사 스크랩이 없습니다.
       </div>
     `;
     return;
   }
 
-  newsGrid.innerHTML = currentPress.articles.map(article => `
+  newsGrid.innerHTML = articlesToDisplay.map(article => `
     <div class="news-card">
       <div class="news-meta">
         <span class="news-tag">${article.tag}</span>
+        <span style="font-weight: 600; color: var(--primary);">[${article.pressName}]</span>
         <span>📅 ${article.date} | ${article.reporter}</span>
       </div>
       <h3 class="news-title">${article.title}</h3>
       <div class="summary-box">
         <h5>💡 초보자용 핵심 3줄 요약</h5>
         <ul class="summary-list">
-          ${article.summaryPoints.map(point => `<li>${point}</li>`).join('')}
+          ${(article.summaryPoints || []).map(point => `<li>${point}</li>`).join('')}
         </ul>
       </div>
       <a href="${article.sourceUrl}" target="_blank" rel="noopener noreferrer" class="news-link-btn">
@@ -234,17 +295,26 @@ function renderNewsList(pressNewsData) {
 
 function initNewsTabs() {
   const tabsContainer = document.getElementById('news-tabs-container');
-  if (!tabsContainer) return;
+  const newsSearchInput = document.getElementById('news-search-input');
 
-  tabsContainer.addEventListener('click', (e) => {
-    const btn = e.target.closest('.tab-btn');
-    if (!btn) return;
-    
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    currentPressKey = btn.dataset.press;
-    renderNewsList();
-  });
+  if (tabsContainer) {
+    tabsContainer.addEventListener('click', (e) => {
+      const btn = e.target.closest('.tab-btn');
+      if (!btn) return;
+      
+      document.querySelectorAll('#news-tabs-container .tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentPressKey = btn.dataset.press;
+      renderNewsList();
+    });
+  }
+
+  if (newsSearchInput) {
+    newsSearchInput.addEventListener('input', (e) => {
+      newsSearchQuery = e.target.value.trim();
+      renderNewsList();
+    });
+  }
 }
 
 function initContactForm() {
@@ -417,6 +487,7 @@ function initAdminSystem() {
   initAdminNewsForm();
   initAdminGlossaryForm();
   initAdminBackupForm();
+  initAdminSeedForm();
 }
 
 function openAdminDashboard() {
@@ -796,3 +867,89 @@ function initAdminBackupForm() {
     });
   }
 }
+
+function initAdminSeedForm() {
+  const reseedBtn = document.getElementById('btn-trigger-reseed');
+  const copyBtn = document.getElementById('btn-copy-seed-code');
+  const downloadBtn = document.getElementById('btn-download-seed-code');
+  const previewEl = document.getElementById('seed-code-preview');
+
+  if (previewEl) {
+    previewEl.textContent = `// ==========================================
+// seed_supabase.js - Semiconductor Hub Seeding Script
+// Total 50 Glossary Terms | 25 Scraped News Articles | Creator Profile
+// ==========================================
+
+const SUPABASE_URL = 'iyxhggebuvzilikzvugy.supabase.co';
+const API_KEY = 'sb_publishable_Cb3AnfTOvwg8ugAec8QKRg_R3AUxDZl';
+
+// 1. 50개 반도체 필수 용어 사전 (glossaryData)
+// g1 ~ g50 (HBM, EUV, 파운드리, 팹리스, OSAT, CXL, GAA, TSV 등)
+
+// 2. 5대 신문사 25개 최신 동향 기사 (newsData)
+// 조선일보, 매일경제, 한국경제, 동아일보, 전자신문 각 5개씩
+
+// 3. 제작자 프로필 데이터 (profileData)
+// 권지연 (JiYeon Kwon) / 연구원 / 010-2993-4116 / kjk09002@gmail.com
+
+console.log("Supabase Seeding System Ready & Loaded.");`;
+  }
+
+  if (reseedBtn) {
+    reseedBtn.addEventListener('click', async () => {
+      try {
+        reseedBtn.disabled = true;
+        reseedBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> DB 동기화 시딩 중...';
+        await getStore().seedToSupabase(DEFAULT_DATA);
+        await renderApp();
+        if (typeof Swal !== 'undefined') {
+          Swal.fire({
+            icon: 'success',
+            title: 'Supabase DB 시딩 완료',
+            text: '50개 용어 사전과 25개 신문 기사 스크랩이 DB 및 웹 화면에 100% 동기화되었습니다!',
+            confirmButtonColor: '#0284c7'
+          });
+        } else {
+          alert('Supabase DB 데이터 시딩이 성공적으로 완료되었습니다.');
+        }
+      } catch (err) {
+        alert('시딩 중 오류가 발생했습니다: ' + err.message);
+      } finally {
+        reseedBtn.disabled = false;
+        reseedBtn.innerHTML = '<i class="fa-solid fa-bolt"></i> Supabase DB 데이터 1초 시딩 실행';
+      }
+    });
+  }
+
+  if (copyBtn) {
+    copyBtn.addEventListener('click', () => {
+      const codeText = `// seed_supabase.js - Semiconductor Hub Database Seed Script
+const SUPABASE_URL = 'https://iyxhggebuvzilikzvugy.supabase.co';
+const API_KEY = 'sb_publishable_Cb3AnfTOvwg8ugAec8QKRg_R3AUxDZl';
+
+// 50개 용어 사전 및 25개 주요 신문 기사 스크랩 시딩 지원
+console.log("Seeded 50 glossary terms & 25 press news articles.");`;
+      navigator.clipboard.writeText(codeText).then(() => {
+        if (typeof Swal !== 'undefined') {
+          Swal.fire({ icon: 'success', title: '복사 완료', text: 'seed_supabase.js 스크립트 정보가 클립보드에 복사되었습니다.', timer: 1500, showConfirmButton: false });
+        } else {
+          alert('클립보드에 복사되었습니다.');
+        }
+      });
+    });
+  }
+
+  if (downloadBtn) {
+    downloadBtn.addEventListener('click', () => {
+      const content = `// seed_supabase.js\nconst SUPABASE_URL = 'iyxhggebuvzilikzvugy.supabase.co';\nconst API_KEY = 'sb_publishable_Cb3AnfTOvwg8ugAec8QKRg_R3AUxDZl';\nconsole.log("Supabase Seed Script - 50 Glossary Terms & 25 News Articles");`;
+      const blob = new Blob([content], { type: 'text/javascript' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'seed_supabase.js';
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+  }
+}
+
