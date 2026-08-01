@@ -1,22 +1,28 @@
 <!DOCTYPE html>
 <html lang="ko">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>반도체 인사이트 포털 | SemiCon Insight</title>
   <meta name="description" content="반도체 시장의 최신 동향, 핵심 기사 큐레이션, 초보자도 쉽게 배우는 반도체 기본 개념과 필수 용어 사전">
   <meta name="keywords" content="반도체, HBM, DRAM, NAND, 파운드리, EUV, 8대공정, 반도체 동향, AI반도체">
+  
+  <!-- FontAwesome 6 Icons CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- SweetAlert2 Modal CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- Supabase JS Client CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
   <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
   <!-- Header / Navigation -->
   <header class="navbar">
     <div class="container nav-container">
       <a href="#" class="logo">
-        <div class="logo-icon">⚡</div>
+        <div class="logo-icon"><i class="fa-solid fa-microchip"></i></div>
         <div class="logo-text">SemiCon <span>Insight</span></div>
       </a>
       <nav>
@@ -26,6 +32,7 @@
           <li><a href="#glossary">용어 사전</a></li>
           <li><a href="#trends">최신 동향</a></li>
           <li><a href="#contact">문의하기</a></li>
+          <li><button type="button" id="open-admin-btn" class="nav-admin-btn"><i class="fa-solid fa-lock"></i> 관리자</button></li>
         </ul>
       </nav>
     </div>
@@ -37,7 +44,7 @@
       <div class="container hero-wrapper">
         <div class="hero-content">
           <div class="badge">
-            <span>💡</span> 초보자부터 전문가까지 쉽게 읽는 반도체
+            <i class="fa-regular fa-lightbulb"></i> 초보자부터 전문가까지 쉽게 읽는 반도체
           </div>
           <h1 class="hero-title">
             복잡한 반도체 동향,<br>
@@ -47,34 +54,34 @@
             투자를 준비하는 투자자, 관련 학과 전공자, 교수진을 위한 반도체 시장 최신 이슈 브리핑과 핵심 개념 총정리 포털입니다.
           </p>
           <div class="hero-buttons">
-            <a href="#trends" class="btn btn-primary">최신 기사 큐레이션 보기 ➔</a>
-            <a href="#glossary" class="btn btn-outline">용어 사전 검색</a>
+            <a href="#trends" class="btn btn-primary"><i class="fa-solid fa-newspaper"></i> 최신 기사 큐레이션 보러가기</a>
+            <a href="#glossary" class="btn btn-outline"><i class="fa-solid fa-magnifying-glass"></i> 용어 사전 검색</a>
           </div>
         </div>
 
         <!-- Hero Stat Visuals -->
         <div class="hero-visual">
-          <div class="stat-card">
-            <div class="stat-icon">🏭</div>
+          <a href="#basics" class="stat-card">
+            <div class="stat-icon"><i class="fa-solid fa-industry"></i></div>
             <div class="stat-info">
               <h4 id="stat-processes">8대 공정</h4>
-              <p>기초 제조 흐름 완벽 해설</p>
+              <p>기초 제조 흐름 완벽 해설 ➔</p>
             </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon">📚</div>
+          </a>
+          <a href="#glossary" class="stat-card">
+            <div class="stat-icon"><i class="fa-solid fa-book-bookmark"></i></div>
             <div class="stat-info">
-              <h4 id="stat-terms">주요 용어 10개+</h4>
-              <p>실시간 키워드 필터 사전</p>
+              <h4 id="stat-terms">주요 용어 50개+</h4>
+              <p>실시간 키워드 검색 바로가기 ➔</p>
             </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon">📰</div>
+          </a>
+          <a href="#trends" class="stat-card">
+            <div class="stat-icon"><i class="fa-solid fa-newspaper"></i></div>
             <div class="stat-info">
               <h4 id="stat-press">3대 신문사 큐레이션</h4>
-              <p>조선·매경·한경 핵심 동향</p>
+              <p>조선·매경·한경 핵심 동향 ➔</p>
             </div>
-          </div>
+          </a>
         </div>
       </div>
     </section>
@@ -84,7 +91,7 @@
       <div class="container">
         <h2 class="section-title">반도체 기초 개념 한눈에 보기</h2>
         <p class="section-subtitle">어려운 반도체 기술 구조와 핵심 8대 공정을 초보자 눈높이로 쉽게 정리했습니다.</p>
-
+        
         <div id="concept-grid-container" class="concept-grid">
           <!-- Rendered via JS -->
         </div>
@@ -100,9 +107,8 @@
         <div class="glossary-box">
           <div class="search-wrapper">
             <div class="search-input-group">
-              <span class="search-icon">🔍</span>
-              <input type="text" id="glossary-search" class="search-input"
-                placeholder="용어 또는 설명 검색 (예: HBM, EUV, 메모리)...">
+              <span class="search-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
+              <input type="text" id="glossary-search" class="search-input" placeholder="용어 또는 설명 검색 (예: HBM, EUV, 메모리)...">
             </div>
             <div id="glossary-tags" class="glossary-tags">
               <!-- Rendered via JS -->
@@ -145,29 +151,29 @@
           <div class="contact-info-panel">
             <div>
               <h3>제작자 프로필</h3>
-              <p>반도체 산업 동향과 기술 개념을 누구나 쉽게 이해할 수 있도록 만드는 인사이트 큐레이터입니다.</p>
+              <p id="creator-bio-text">반도체 산업 동향과 기술 개념을 누구나 쉽게 이해할 수 있도록 만드는 인사이트 큐레이터입니다.</p>
             </div>
 
             <div class="info-items">
               <div class="info-item">
-                <div class="info-icon">👤</div>
+                <div class="info-icon"><i class="fa-solid fa-user"></i></div>
                 <div class="info-details">
                   <label>이름 (Name)</label>
-                  <span>권지연 (JiYeon Kwon)</span>
+                  <span id="creator-name-text">김반도 (Kim Semi)</span>
                 </div>
               </div>
               <div class="info-item">
-                <div class="info-icon">📞</div>
+                <div class="info-icon"><i class="fa-solid fa-phone"></i></div>
                 <div class="info-details">
                   <label>전화번호 (Phone)</label>
-                  <span>010-2993-4116</span>
+                  <span id="creator-phone-text">010-1234-5678</span>
                 </div>
               </div>
               <div class="info-item">
-                <div class="info-icon">✉️</div>
+                <div class="info-icon"><i class="fa-solid fa-envelope"></i></div>
                 <div class="info-details">
                   <label>이메일 (Email)</label>
-                  <span>kjk09002@gmail.com</span>
+                  <span id="creator-email-text">contact@semicon-insight.kr</span>
                 </div>
               </div>
             </div>
@@ -186,11 +192,10 @@
               </div>
               <div class="form-group">
                 <label for="sender-message" class="form-label">문의 및 의견 내용 *</label>
-                <textarea id="sender-message" class="form-control" placeholder="궁금하신 내용이나 추가되었으면 하는 반도체 용어/동향을 적어주세요."
-                  required></textarea>
+                <textarea id="sender-message" class="form-control" placeholder="궁금하신 내용이나 추가되었으면 하는 반도체 용어/동향을 적어주세요." required></textarea>
               </div>
               <button type="submit" class="btn btn-primary" style="width: 100%;">
-                <span>✉️</span> 문의 메일 전송하기
+                <i class="fa-solid fa-paper-plane"></i> 문의 메일 전송하기
               </button>
             </form>
           </div>
@@ -199,10 +204,10 @@
     </section>
   </main>
 
-  <!-- Success Modal (Interactive Demo) -->
+  <!-- User Success Modal -->
   <div id="success-modal" class="modal-overlay">
     <div class="modal-card">
-      <div class="modal-icon">🎉</div>
+      <div class="modal-icon"><i class="fa-solid fa-circle-check"></i></div>
       <h3 class="modal-title">문의가 성공적으로 전달되었습니다!</h3>
       <p class="modal-desc">
         <strong id="modal-user-name"></strong> 님, 작성해주신 소중한 메시지와 문의 사항이 제작자에게 정상 수신되었습니다. 빠른 시일 내에 답변해 드리겠습니다.
@@ -211,16 +216,223 @@
     </div>
   </div>
 
+  <!-- Admin Login Modal -->
+  <div id="admin-login-modal" class="modal-overlay">
+    <div class="modal-card admin-login-card">
+      <div class="admin-modal-header">
+        <i class="fa-solid fa-shield-halved admin-modal-icon"></i>
+        <h3>관리자 접속 인증</h3>
+        <p>사이트 관리자 비밀번호를 입력해 주세요.</p>
+      </div>
+      <form id="admin-login-form">
+        <div class="form-group" style="text-align: left; margin-bottom: 1.5rem;">
+          <label class="form-label" for="admin-password-input">비밀번호</label>
+          <input type="password" id="admin-password-input" class="form-control" placeholder="비밀번호 입력" required autofocus>
+          <span id="login-error-msg" class="error-msg">비밀번호가 올바르지 않습니다.</span>
+        </div>
+        <div style="display: flex; gap: 0.8rem;">
+          <button type="button" id="admin-login-cancel" class="btn btn-outline" style="flex: 1;">취소</button>
+          <button type="submit" class="btn btn-primary" style="flex: 1;"><i class="fa-solid fa-key"></i> 로그인</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Admin Dashboard Modal -->
+  <div id="admin-dashboard-modal" class="modal-overlay">
+    <div class="admin-dashboard-card">
+      <div class="admin-dashboard-header">
+        <div class="admin-dash-title">
+          <i class="fa-solid fa-sliders"></i>
+          <div>
+            <h3>SemiCon Insight 관리자 대시보드</h3>
+            <p>사이트 제작자 프로필, 동향 기사 및 용어 사전을 관리하고 로컬스토리지에 저장합니다.</p>
+          </div>
+        </div>
+        <button id="admin-dash-close-btn" class="close-icon-btn"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <!-- Dashboard Navigation Tabs -->
+      <div class="dash-nav-tabs">
+        <button class="dash-tab-btn active" data-tab="tab-profile"><i class="fa-solid fa-id-card"></i> 프로필 관리</button>
+        <button class="dash-tab-btn" data-tab="tab-news"><i class="fa-solid fa-newspaper"></i> 동향 기사 관리</button>
+        <button class="dash-tab-btn" data-tab="tab-glossary"><i class="fa-solid fa-spell-check"></i> 용어 사전 관리</button>
+        <button class="dash-tab-btn" data-tab="tab-backup"><i class="fa-solid fa-floppy-disk"></i> 백업 & 비밀번호</button>
+      </div>
+
+      <!-- Tab Content Area -->
+      <div class="dash-body">
+        
+        <!-- Tab 1: Profile -->
+        <div id="tab-profile" class="dash-tab-content active">
+          <h4 class="dash-section-title"><i class="fa-solid fa-user-pen"></i> 제작자 프로필 수정</h4>
+          <form id="admin-profile-form">
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label class="form-label">제작자 이름 *</label>
+                <input type="text" id="edit-creator-name" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">전화번호 *</label>
+                <input type="text" id="edit-creator-phone" class="form-control" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">이메일 주소 *</label>
+              <input type="email" id="edit-creator-email" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">소개글 (Bio) *</label>
+              <textarea id="edit-creator-bio" class="form-control" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> 프로필 정보 저장</button>
+          </form>
+        </div>
+
+        <!-- Tab 2: News Management -->
+        <div id="tab-news" class="dash-tab-content">
+          <h4 class="dash-section-title"><i class="fa-solid fa-newspaper"></i> 신규 언론사 등록 및 관리</h4>
+          <form id="admin-add-press-form" style="margin-bottom: 1.5rem; background: var(--bg-secondary); padding: 1.2rem; border-radius: var(--radius-md);">
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label class="form-label">언론사 이름 (예: 동아일보, 전자신문) *</label>
+                <input type="text" id="press-name-input" class="form-control" placeholder="예: 동아일보" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">영문 식별 키 (예: donga) *</label>
+                <input type="text" id="press-key-input" class="form-control" placeholder="예: donga" required>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-outline" style="width: 100%;"><i class="fa-solid fa-plus"></i> 새 언론사 카테고리 추가</button>
+          </form>
+
+          <h4 class="dash-section-title"><i class="fa-solid fa-plus-circle"></i> 새 동향 기사 추가</h4>
+          <form id="admin-add-news-form" style="margin-bottom: 2rem;">
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label class="form-label">언론사 선택 *</label>
+                <select id="news-press-select" class="form-control" required>
+                  <!-- Rendered via JS -->
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">태그 (예: HBM, 기술혁신) *</label>
+                <input type="text" id="news-tag-input" class="form-control" placeholder="AI반도체" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">기사 제목 *</label>
+              <input type="text" id="news-title-input" class="form-control" placeholder="기사 제목 입력" required>
+            </div>
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label class="form-label">발행일자 *</label>
+                <input type="text" id="news-date-input" class="form-control" placeholder="2026.08.01" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">기자/부서명 *</label>
+                <input type="text" id="news-reporter-input" class="form-control" placeholder="IT산업부" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">기사 원문 URL *</label>
+              <input type="url" id="news-url-input" class="form-control" placeholder="https://..." required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">초보자용 3줄 핵심 요약 (줄바꿈 구분) *</label>
+              <textarea id="news-summary-input" class="form-control" placeholder="1번째 핵심 내용&#10;2번째 핵심 내용&#10;3번째 핵심 내용" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-newspaper"></i> 새 기사 등록하기</button>
+          </form>
+
+          <h4 class="dash-section-title"><i class="fa-solid fa-list"></i> 등록된 기사 목록 관리</h4>
+          <div id="admin-news-list" class="admin-items-list">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+
+        <!-- Tab 3: Glossary Management -->
+        <div id="tab-glossary" class="dash-tab-content">
+          <h4 class="dash-section-title"><i class="fa-solid fa-plus-circle"></i> 새 반도체 용어 추가</h4>
+          <form id="admin-add-glossary-form" style="margin-bottom: 2rem;">
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label class="form-label">용어명 (Term) *</label>
+                <input type="text" id="glossary-term-input" class="form-control" placeholder="예: CXL" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">카테고리 *</label>
+                <input type="text" id="glossary-cat-input" class="form-control" placeholder="예: 메모리, 후공정, 차세대기술" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">용어 정의 및 쉽게 풀이한 설명 *</label>
+              <textarea id="glossary-def-input" class="form-control" placeholder="초보자가 이해하기 쉬운 용어 설명을 입력하세요." required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-book"></i> 용어 등록하기</button>
+          </form>
+
+          <h4 class="dash-section-title"><i class="fa-solid fa-book-bookmark"></i> 등록된 용어 목록 관리</h4>
+          <div id="admin-glossary-list" class="admin-items-list">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+
+        <!-- Tab 4: Backup & Password -->
+        <div id="tab-backup" class="dash-tab-content">
+          <h4 class="dash-section-title"><i class="fa-solid fa-file-export"></i> 데이터 백업 및 복원 (JSON)</h4>
+          <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">
+            등록된 기사, 용어 사전, 프로필 데이터 전체를 `.json` 파일로 백업 다운로드하거나 기존 백업 파일을 업로드하여 복원할 수 있습니다.
+          </p>
+          <div class="backup-actions">
+            <button type="button" id="btn-export-json" class="btn btn-outline"><i class="fa-solid fa-download"></i> 백업 파일 다운로드 (.json)</button>
+            <label for="import-json-file" class="btn btn-outline" style="cursor: pointer;">
+              <i class="fa-solid fa-upload"></i> 백업 파일 불러오기 (.json)
+            </label>
+            <input type="file" id="import-json-file" accept=".json" style="display: none;">
+            <button type="button" id="btn-reset-defaults" class="btn btn-danger-outline"><i class="fa-solid fa-rotate-left"></i> 기본 샘플 데이터로 복구</button>
+          </div>
+
+          <hr style="margin: 2rem 0; border: none; border-top: 1px dashed var(--border-color);">
+
+          <h4 class="dash-section-title"><i class="fa-solid fa-key"></i> 관리자 비밀번호 변경</h4>
+          <form id="admin-change-password-form">
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label class="form-label">새 비밀번호 입력 *</label>
+                <input type="password" id="new-pw-input" class="form-control" placeholder="새 비밀번호" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">새 비밀번호 확인 *</label>
+                <input type="password" id="confirm-pw-input" class="form-control" placeholder="비밀번호 다시 입력" required>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-lock"></i> 비밀번호 변경하기</button>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
   <!-- Footer -->
   <footer>
-    <div class="container">
+    <div class="container footer-container">
       <p>© 2026 SemiCon Insight. All rights reserved. Designed for Investors, Students & Professors.</p>
+      <button type="button" id="footer-admin-btn" class="footer-admin-link"><i class="fa-solid fa-gear"></i> 관리자 모드</button>
     </div>
   </footer>
 
   <!-- Scripts -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script type="text/javascript">
+    (function(){
+      if (typeof emailjs !== 'undefined') {
+        emailjs.init({ publicKey: "a-jC2llJwd0O5xSSJ" });
+      }
+    })();
+  </script>
   <script src="data.js"></script>
   <script src="app.js"></script>
 </body>
-
 </html>
