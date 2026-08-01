@@ -1236,3 +1236,45 @@ footer {
   }
 }
 
+/* Admin Action Buttons */
+.admin-actions-group {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.btn-edit {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+  border-radius: var(--radius-sm);
+  background: var(--bg-accent-soft);
+  color: var(--primary);
+  border: 1px solid rgba(2, 132, 199, 0.2);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-edit:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+.btn-delete {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+  border-radius: var(--radius-sm);
+  background: #fef2f2;
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-delete:hover {
+  background: #ef4444;
+  color: #fff;
+}
+
