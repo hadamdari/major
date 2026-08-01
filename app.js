@@ -5,6 +5,7 @@
 document.addEventListener('DOMContentLoaded', () => {
   initAdminSystem();
   initHeroStats();
+  initConceptSearch();
   initGlossarySearch();
   initNewsTabs();
   initContactForm();
@@ -109,18 +110,52 @@ function initHeroStats() {
 }
 
 let activeConceptCategory = '전체';
+let conceptSearchQuery = '';
+
+function initConceptSearch() {
+  const searchInput = document.getElementById('concept-search-input');
+  if (!searchInput) return;
+  searchInput.addEventListener('input', (e) => {
+    conceptSearchQuery = e.target.value;
+    const storeConcepts = getStore().getData().concepts;
+    const freshConcepts = (Array.isArray(storeConcepts) && storeConcepts.length > 0) ? storeConcepts : DEFAULT_DATA.concepts;
+    renderConcepts(freshConcepts);
+  });
+}
+
+function resetConceptFilter() {
+  activeConceptCategory = '전체';
+  conceptSearchQuery = '';
+  const searchInput = document.getElementById('concept-search-input');
+  if (searchInput) searchInput.value = '';
+  const storeConcepts = getStore().getData().concepts;
+  const freshConcepts = (Array.isArray(storeConcepts) && storeConcepts.length > 0) ? storeConcepts : DEFAULT_DATA.concepts;
+  renderConcepts(freshConcepts);
+}
+if (typeof window !== 'undefined') {
+  window.resetConceptFilter = resetConceptFilter;
+}
 
 function renderConcepts(concepts) {
   const container = document.getElementById('concept-grid-container');
   const tagsContainer = document.getElementById('concept-tags');
   const counterEl = document.getElementById('concept-counter');
   const storeData = getStore().getData();
-  const allConcepts = concepts || storeData.concepts || DEFAULT_DATA.concepts;
+  
+  const rawConcepts = (Array.isArray(concepts) && concepts.length > 0)
+    ? concepts
+    : ((Array.isArray(storeData.concepts) && storeData.concepts.length > 0)
+      ? storeData.concepts
+      : DEFAULT_DATA.concepts);
 
-  if (!container || !allConcepts) return;
+  const allConcepts = (Array.isArray(rawConcepts) && rawConcepts.length > 0)
+    ? rawConcepts
+    : DEFAULT_DATA.concepts;
+
+  if (!container) return;
 
   if (counterEl) {
-    counterEl.textContent = allConcepts.length || 8;
+    counterEl.textContent = allConcepts.length;
   }
 
   // Render concept category tags
@@ -132,28 +167,40 @@ function renderConcepts(concepts) {
       </button>
     `).join('');
 
-    // Attach click handler once or delegate
     if (!tagsContainer.dataset.initialized) {
       tagsContainer.dataset.initialized = 'true';
       tagsContainer.addEventListener('click', (e) => {
         const btn = e.target.closest('.tag-btn');
         if (!btn) return;
         activeConceptCategory = btn.dataset.conceptCat;
-        const freshConcepts = getStore().getData().concepts || DEFAULT_DATA.concepts;
+        const freshData = getStore().getData().concepts;
+        const freshConcepts = (Array.isArray(freshData) && freshData.length > 0) ? freshData : DEFAULT_DATA.concepts;
         renderConcepts(freshConcepts);
       });
     }
   }
 
-  // Filter concepts
+  // Filter concepts with category & search query
+  const q = conceptSearchQuery.trim().toLowerCase();
   const filtered = allConcepts.filter(item => {
-    return activeConceptCategory === '전체' || item.category === activeConceptCategory;
+    const matchCat = activeConceptCategory === '전체' || item.category === activeConceptCategory;
+    const matchSearch = !q ||
+      item.title.toLowerCase().includes(q) ||
+      item.summary.toLowerCase().includes(q) ||
+      (item.details || []).some(d => d.toLowerCase().includes(q)) ||
+      item.category.toLowerCase().includes(q);
+    return matchCat && matchSearch;
   });
 
   if (filtered.length === 0) {
     container.innerHTML = `
-      <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 2.5rem;">
-        🔍 선택된 카테고리에 해당하는 기본 개념이 없습니다.
+      <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 3rem 1.5rem; background: var(--bg-card); border-radius: var(--radius-lg); border: 1px dashed var(--border-color);">
+        <div style="font-size: 2.5rem; margin-bottom: 0.8rem;">🔍</div>
+        <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--secondary); margin-bottom: 0.5rem;">선택한 조건에 해당하는 반도체 개념이 없습니다.</h4>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.2rem;">카테고리를 변경하거나 아래 버튼을 눌러 전체 반도체 개념을 다시 확인해보세요.</p>
+        <button onclick="resetConceptFilter()" class="tag-btn active" style="padding: 0.55rem 1.3rem; font-size: 0.9rem; cursor: pointer;">
+          <i class="fa-solid fa-rotate-left"></i> 전체 개념 목록 보기
+        </button>
       </div>
     `;
     return;
