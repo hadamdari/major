@@ -21,7 +21,7 @@ try {
 }
 
 const STORAGE_KEYS = {
-  DATA: 'SEMICON_HUB_DATA_V7', // V7로 갱신하여 5대 언론사(25개 기사) 및 용어 50개 자동 로드
+  DATA: 'SEMICON_HUB_DATA_V8', // V8로 갱신하여 5대 언론사(25개 기사) 및 50개 용어, 권지연 프로필 완벽 강제 보장
   PASSWORD: 'SEMICON_HUB_ADMIN_PW'
 };
 
