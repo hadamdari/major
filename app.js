@@ -616,9 +616,12 @@ function initAdminSystem() {
   initAdminProfileForm();
   initAdminPressForm();
   initAdminNewsForm();
+  initAdminConceptForm();
   initAdminGlossaryForm();
   initAdminBackupForm();
   initAdminSeedForm();
+  initEditGlossaryModal();
+  initEditConceptModal();
 }
 
 function openAdminDashboard() {
@@ -640,6 +643,7 @@ function openAdminDashboard() {
 
   renderPressSelectOptions();
   renderAdminNewsList();
+  renderAdminConceptsList();
   renderAdminGlossaryList();
 
   dashModal.classList.add('active');
@@ -854,24 +858,213 @@ function initAdminNewsForm() {
   });
 }
 
+// 7-3. 기초 개념 관리 (목록, 추가, 수정, 삭제)
+function renderAdminConceptsList() {
+  const container = document.getElementById('admin-concepts-list');
+  const data = getStore().getData() || {};
+  const concepts = (Array.isArray(data.concepts) && data.concepts.length > 0) ? data.concepts : DEFAULT_DATA.concepts;
+  if (!container) return;
+
+  container.innerHTML = concepts.map(item => `
+    <div class="admin-item-row" style="margin-bottom:0.8rem; background:#fff; padding:1rem; border-radius:8px; border:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
+      <div style="flex:1; padding-right:1rem;">
+        <div class="admin-item-title" style="font-weight:700; color:var(--secondary); font-size:0.95rem; margin-bottom:0.2rem;">
+          ${item.icon || '💡'} ${item.title} <span class="glossary-cat-badge">${item.category}</span>
+        </div>
+        <div class="admin-item-sub" style="font-size:0.82rem; color:var(--text-muted);">${item.summary}</div>
+      </div>
+      <div class="admin-actions-group">
+        <button type="button" class="btn-edit" onclick="openEditConceptModal('${item.id}')">
+          <i class="fa-solid fa-pen"></i> 수정
+        </button>
+        <button type="button" class="btn-delete" onclick="deleteConceptItem('${item.id}')">
+          <i class="fa-solid fa-trash"></i> 삭제
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function initAdminConceptForm() {
+  const form = document.getElementById('admin-add-concept-form');
+  if (!form) return;
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const detailsText = document.getElementById('concept-details-input').value;
+    const detailsArr = detailsText.split('\n').map(s => s.trim()).filter(Boolean);
+
+    const newItem = {
+      id: 'c_' + Date.now(),
+      title: document.getElementById('concept-title-input').value.trim(),
+      category: document.getElementById('concept-cat-input').value.trim(),
+      icon: document.getElementById('concept-icon-input').value.trim() || '💡',
+      summary: document.getElementById('concept-summary-input').value.trim(),
+      details: detailsArr
+    };
+
+    await getStore().addConcept(newItem);
+    renderAdminConceptsList();
+    const freshConcepts = getStore().getData().concepts;
+    renderConcepts(freshConcepts);
+    form.reset();
+
+    if (typeof Swal !== 'undefined') {
+      Swal.fire({ icon: 'success', title: '새 기초 개념 등록 완료', text: 'Supabase DB 및 웹 화면에 저장되었습니다.', confirmButtonColor: '#0284c7' });
+    }
+  });
+}
+
+function deleteConceptItem(conceptId) {
+  const action = async () => {
+    await getStore().deleteConcept(conceptId);
+    renderAdminConceptsList();
+    renderConcepts(getStore().getData().concepts);
+  };
+
+  if (typeof Swal !== 'undefined') {
+    Swal.fire({
+      title: '개념 항목을 삭제하시겠습니까?',
+      text: '메인 화면 및 DB에서 제거됩니다.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#64748b',
+      confirmButtonText: '삭제하기',
+      cancelButtonText: '취소'
+    }).then(res => { if (res.isConfirmed) action(); });
+  } else {
+    if (confirm('개념 항목을 삭제하시겠습니까?')) action();
+  }
+}
+
+function openEditConceptModal(conceptId) {
+  const data = getStore().getData() || {};
+  const concepts = (Array.isArray(data.concepts) && data.concepts.length > 0) ? data.concepts : DEFAULT_DATA.concepts;
+  const item = concepts.find(c => c.id === conceptId);
+  if (!item) return;
+
+  document.getElementById('edit-concept-id').value = item.id;
+  document.getElementById('edit-concept-title').value = item.title;
+  document.getElementById('edit-concept-cat').value = item.category;
+  document.getElementById('edit-concept-icon').value = item.icon || '💡';
+  document.getElementById('edit-concept-summary').value = item.summary;
+  document.getElementById('edit-concept-details').value = (item.details || []).join('\n');
+
+  const modal = document.getElementById('admin-edit-concept-modal');
+  if (modal) modal.classList.add('active');
+}
+
+function initEditConceptModal() {
+  const modal = document.getElementById('admin-edit-concept-modal');
+  const closeBtn = document.getElementById('close-edit-concept-modal');
+  const cancelBtn = document.getElementById('btn-cancel-edit-concept');
+  const form = document.getElementById('admin-edit-concept-form');
+
+  const closeModal = () => modal && modal.classList.remove('active');
+
+  if (closeBtn) closeBtn.addEventListener('click', closeModal);
+  if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const detailsText = document.getElementById('edit-concept-details').value;
+      const detailsArr = detailsText.split('\n').map(s => s.trim()).filter(Boolean);
+
+      const updatedItem = {
+        id: document.getElementById('edit-concept-id').value,
+        title: document.getElementById('edit-concept-title').value.trim(),
+        category: document.getElementById('edit-concept-cat').value.trim(),
+        icon: document.getElementById('edit-concept-icon').value.trim() || '💡',
+        summary: document.getElementById('edit-concept-summary').value.trim(),
+        details: detailsArr
+      };
+
+      await getStore().updateConcept(updatedItem);
+      renderAdminConceptsList();
+      renderConcepts(getStore().getData().concepts);
+      closeModal();
+
+      if (typeof Swal !== 'undefined') {
+        Swal.fire({ icon: 'success', title: '기초 개념 수정 완료', text: '수정사항이 저장되었습니다.', confirmButtonColor: '#0284c7' });
+      }
+    });
+  }
+}
+
+// 7-4. 용어 사전 관리 (목록, 추가, 수정, 삭제)
 function renderAdminGlossaryList() {
   const container = document.getElementById('admin-glossary-list');
   const data = getStore().getData() || {};
   if (!container || !data.glossary) return;
 
   container.innerHTML = data.glossary.map(item => `
-    <div class="admin-item-row" style="margin-bottom:0.8rem; background:#fff; padding:1rem; border-radius:8px; border:1px solid var(--border-color);">
+    <div class="admin-item-row" style="margin-bottom:0.8rem; background:#fff; padding:1rem; border-radius:8px; border:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
       <div style="flex:1; padding-right:1rem;">
         <div class="admin-item-title" style="font-weight:700; color:var(--secondary); font-size:0.95rem; margin-bottom:0.2rem;">
           ${item.term} <span class="glossary-cat-badge">${item.category}</span>
         </div>
         <div class="admin-item-sub" style="font-size:0.82rem; color:var(--text-muted);">${item.definition}</div>
       </div>
-      <button type="button" class="btn-delete" onclick="deleteGlossaryItem('${item.id}')" style="white-space:nowrap;">
-        <i class="fa-solid fa-trash"></i> 삭제
-      </button>
+      <div class="admin-actions-group">
+        <button type="button" class="btn-edit" onclick="openEditGlossaryModal('${item.id}')">
+          <i class="fa-solid fa-pen"></i> 수정
+        </button>
+        <button type="button" class="btn-delete" onclick="deleteGlossaryItem('${item.id}')">
+          <i class="fa-solid fa-trash"></i> 삭제
+        </button>
+      </div>
     </div>
   `).join('');
+}
+
+function openEditGlossaryModal(glossaryId) {
+  const data = getStore().getData() || {};
+  const glossary = data.glossary || [];
+  const item = glossary.find(g => g.id === glossaryId);
+  if (!item) return;
+
+  document.getElementById('edit-glossary-id').value = item.id;
+  document.getElementById('edit-glossary-term').value = item.term;
+  document.getElementById('edit-glossary-cat').value = item.category;
+  document.getElementById('edit-glossary-def').value = item.definition;
+
+  const modal = document.getElementById('admin-edit-glossary-modal');
+  if (modal) modal.classList.add('active');
+}
+
+function initEditGlossaryModal() {
+  const modal = document.getElementById('admin-edit-glossary-modal');
+  const closeBtn = document.getElementById('close-edit-glossary-modal');
+  const cancelBtn = document.getElementById('btn-cancel-edit-glossary');
+  const form = document.getElementById('admin-edit-glossary-form');
+
+  const closeModal = () => modal && modal.classList.remove('active');
+
+  if (closeBtn) closeBtn.addEventListener('click', closeModal);
+  if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const updatedItem = {
+        id: document.getElementById('edit-glossary-id').value,
+        term: document.getElementById('edit-glossary-term').value.trim(),
+        category: document.getElementById('edit-glossary-cat').value.trim(),
+        definition: document.getElementById('edit-glossary-def').value.trim()
+      };
+
+      await getStore().updateGlossary(updatedItem);
+      renderAdminGlossaryList();
+      renderGlossaryList(getStore().getData().glossary);
+      closeModal();
+
+      if (typeof Swal !== 'undefined') {
+        Swal.fire({ icon: 'success', title: '용어 수정 완료', text: '수정사항이 저장되었습니다.', confirmButtonColor: '#0284c7' });
+      }
+    });
+  }
 }
 
 function deleteGlossaryItem(glossaryId) {
@@ -1082,5 +1275,13 @@ console.log("Seeded 50 glossary terms & 25 press news articles.");`;
       URL.revokeObjectURL(url);
     });
   }
+}
+
+// Global Window Object Bindings for Inline Onclick Handlers
+if (typeof window !== 'undefined') {
+  window.openEditGlossaryModal = openEditGlossaryModal;
+  window.openEditConceptModal = openEditConceptModal;
+  window.deleteConceptItem = deleteConceptItem;
+  window.deleteGlossaryItem = deleteGlossaryItem;
 }
 

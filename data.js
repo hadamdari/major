@@ -823,6 +823,99 @@ const DataStore = {
     }
   },
 
+  async updateGlossary(item) {
+    const current = this.getData();
+    if (!current.glossary) current.glossary = [];
+    const idx = current.glossary.findIndex(g => g.id === item.id);
+    if (idx !== -1) {
+      current.glossary[idx] = { ...current.glossary[idx], ...item };
+    } else {
+      current.glossary.unshift(item);
+    }
+    this.saveLocalData(current);
+    this.cache = current;
+
+    if (supabase) {
+      try {
+        await supabase.from('glossary').upsert([{
+          id: item.id,
+          term: item.term,
+          category: item.category,
+          definition: item.definition
+        }]);
+      } catch (e) {
+        console.error("Supabase update glossary error", e);
+      }
+    }
+  },
+
+  async addConcept(item) {
+    const current = this.getData();
+    if (!current.concepts) current.concepts = [];
+    current.concepts.unshift(item);
+    this.saveLocalData(current);
+    this.cache = current;
+
+    if (supabase) {
+      try {
+        await supabase.from('concepts').upsert([{
+          id: item.id,
+          title: item.title,
+          category: item.category,
+          icon: item.icon || '💡',
+          summary: item.summary,
+          details: JSON.stringify(item.details || [])
+        }]);
+      } catch (e) {
+        console.error("Supabase add concept error", e);
+      }
+    }
+  },
+
+  async updateConcept(item) {
+    const current = this.getData();
+    if (!current.concepts) current.concepts = [];
+    const idx = current.concepts.findIndex(c => c.id === item.id);
+    if (idx !== -1) {
+      current.concepts[idx] = { ...current.concepts[idx], ...item };
+    } else {
+      current.concepts.unshift(item);
+    }
+    this.saveLocalData(current);
+    this.cache = current;
+
+    if (supabase) {
+      try {
+        await supabase.from('concepts').upsert([{
+          id: item.id,
+          title: item.title,
+          category: item.category,
+          icon: item.icon || '💡',
+          summary: item.summary,
+          details: JSON.stringify(item.details || [])
+        }]);
+      } catch (e) {
+        console.error("Supabase update concept error", e);
+      }
+    }
+  },
+
+  async deleteConcept(id) {
+    const current = this.getData();
+    if (!current.concepts) current.concepts = [];
+    current.concepts = current.concepts.filter(c => c.id !== id);
+    this.saveLocalData(current);
+    this.cache = current;
+
+    if (supabase) {
+      try {
+        await supabase.from('concepts').delete().eq('id', id);
+      } catch (e) {
+        console.error("Supabase delete concept error", e);
+      }
+    }
+  },
+
   async deleteGlossary(id) {
     const current = this.getData();
     current.glossary = current.glossary.filter(g => g.id !== id);
