@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>반도체 인사이트 포털 | SemiCon Insight</title>
+  <meta name="description" content="반도체 시장의 최신 동향, 핵심 기사 큐레이션, 초보자도 쉽게 배우는 반도체 기본 개념과 필수 용어 사전">
+  <meta name="keywords" content="반도체, HBM, DRAM, NAND, 파운드리, EUV, 8대공정, 반도체 동향, AI반도체">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- Header / Navigation -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="#" class="logo">
+        <div class="logo-icon">⚡</div>
+        <div class="logo-text">SemiCon <span>Insight</span></div>
+      </a>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="#hero">홈</a></li>
+          <li><a href="#basics">기초 개념</a></li>
+          <li><a href="#glossary">용어 사전</a></li>
+          <li><a href="#trends">최신 동향</a></li>
+          <li><a href="#contact">문의하기</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero Section -->
+    <section id="hero" class="hero">
+      <div class="container hero-wrapper">
+        <div class="hero-content">
+          <div class="badge">
+            <span>💡</span> 초보자부터 전문가까지 쉽게 읽는 반도체
+          </div>
+          <h1 class="hero-title">
+            복잡한 반도체 동향,<br>
+            <span>쉽고 명확하게</span> 파악하세요.
+          </h1>
+          <p class="hero-description">
+            투자를 준비하는 투자자, 관련 학과 전공자, 교수진을 위한 반도체 시장 최신 이슈 브리핑과 핵심 개념 총정리 포털입니다.
+          </p>
+          <div class="hero-buttons">
+            <a href="#trends" class="btn btn-primary">최신 기사 큐레이션 보기 ➔</a>
+            <a href="#glossary" class="btn btn-outline">용어 사전 검색</a>
+          </div>
+        </div>
+
+        <!-- Hero Stat Visuals -->
+        <div class="hero-visual">
+          <div class="stat-card">
+            <div class="stat-icon">🏭</div>
+            <div class="stat-info">
+              <h4 id="stat-processes">8대 공정</h4>
+              <p>기초 제조 흐름 완벽 해설</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">📚</div>
+            <div class="stat-info">
+              <h4 id="stat-terms">주요 용어 10개+</h4>
+              <p>실시간 키워드 필터 사전</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">📰</div>
+            <div class="stat-info">
+              <h4 id="stat-press">3대 신문사 큐레이션</h4>
+              <p>조선·매경·한경 핵심 동향</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 1: Semiconductor Basics -->
+    <section id="basics" class="section">
+      <div class="container">
+        <h2 class="section-title">반도체 기초 개념 한눈에 보기</h2>
+        <p class="section-subtitle">어려운 반도체 기술 구조와 핵심 8대 공정을 초보자 눈높이로 쉽게 정리했습니다.</p>
+
+        <div id="concept-grid-container" class="concept-grid">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Glossary (Searchable Terms) -->
+    <section id="glossary" class="section section-alt">
+      <div class="container">
+        <h2 class="section-title">반도체 필수 용어 사전</h2>
+        <p class="section-subtitle">HBM, EUV, 파운드리 등 뉴스에 자주 나오는 반도체 용어를 검색해보세요.</p>
+
+        <div class="glossary-box">
+          <div class="search-wrapper">
+            <div class="search-input-group">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="glossary-search" class="search-input"
+                placeholder="용어 또는 설명 검색 (예: HBM, EUV, 메모리)...">
+            </div>
+            <div id="glossary-tags" class="glossary-tags">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <div id="glossary-grid" class="glossary-grid">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: News Trends (Press Tabs) -->
+    <section id="trends" class="section">
+      <div class="container">
+        <h2 class="section-title">반도체 시장 최신 동향 & 기사</h2>
+        <p class="section-subtitle">한국 주요 3개 신문사의 핵심 반도체 기사를 3줄 요약과 함께 열람하세요.</p>
+
+        <!-- Press Selector Tabs -->
+        <div id="news-tabs-container" class="news-tabs">
+          <!-- Rendered via JS -->
+        </div>
+
+        <!-- News Cards Grid -->
+        <div id="news-grid-container" class="news-grid">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 4: Creator Contact & Profile -->
+    <section id="contact" class="section section-alt">
+      <div class="container">
+        <h2 class="section-title">제작자 문의하기</h2>
+        <p class="section-subtitle">사이트 관련 의견이나 궁금한 점이 있으시다면 언제든 연락주세요.</p>
+
+        <div class="contact-wrapper">
+          <!-- Left: Creator Info Panel -->
+          <div class="contact-info-panel">
+            <div>
+              <h3>제작자 프로필</h3>
+              <p>반도체 산업 동향과 기술 개념을 누구나 쉽게 이해할 수 있도록 만드는 인사이트 큐레이터입니다.</p>
+            </div>
+
+            <div class="info-items">
+              <div class="info-item">
+                <div class="info-icon">👤</div>
+                <div class="info-details">
+                  <label>이름 (Name)</label>
+                  <span>권지연 (JiYeon Kwon)</span>
+                </div>
+              </div>
+              <div class="info-item">
+                <div class="info-icon">📞</div>
+                <div class="info-details">
+                  <label>전화번호 (Phone)</label>
+                  <span>010-2993-4116</span>
+                </div>
+              </div>
+              <div class="info-item">
+                <div class="info-icon">✉️</div>
+                <div class="info-details">
+                  <label>이메일 (Email)</label>
+                  <span>kjk09002@gmail.com</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Interactive Contact Form -->
+          <div class="contact-form-panel">
+            <form id="contact-form">
+              <div class="form-group">
+                <label for="sender-name" class="form-label">보내시는 분 성함 *</label>
+                <input type="text" id="sender-name" class="form-control" placeholder="홍길동" required>
+              </div>
+              <div class="form-group">
+                <label for="sender-email" class="form-label">이메일 주소 *</label>
+                <input type="email" id="sender-email" class="form-control" placeholder="example@email.com" required>
+              </div>
+              <div class="form-group">
+                <label for="sender-message" class="form-label">문의 및 의견 내용 *</label>
+                <textarea id="sender-message" class="form-control" placeholder="궁금하신 내용이나 추가되었으면 하는 반도체 용어/동향을 적어주세요."
+                  required></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary" style="width: 100%;">
+                <span>✉️</span> 문의 메일 전송하기
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Success Modal (Interactive Demo) -->
+  <div id="success-modal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-icon">🎉</div>
+      <h3 class="modal-title">문의가 성공적으로 전달되었습니다!</h3>
+      <p class="modal-desc">
+        <strong id="modal-user-name"></strong> 님, 작성해주신 소중한 메시지와 문의 사항이 제작자에게 정상 수신되었습니다. 빠른 시일 내에 답변해 드리겠습니다.
+      </p>
+      <button id="modal-close-btn" class="btn btn-primary">확인 완료</button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p>© 2026 SemiCon Insight. All rights reserved. Designed for Investors, Students & Professors.</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+
+</html>
