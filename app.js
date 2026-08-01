@@ -276,24 +276,32 @@ function initContactForm() {
     const templateParams = {
       from_name: name,
       from_named: name,
+      user_name: name,
+      name: name,
       from_email: email,
+      user_email: email,
+      email: email,
+      reply_to: email,
       message: message,
       to_email: "kjk09002@gmail.com"
     };
 
     const SERVICE_ID = "service_aluct4d";
     const TEMPLATE_ID = "template_5evf61k";
+    const PUBLIC_KEY = "a-jC2llJwd0O5xSSJ";
 
     if (typeof emailjs !== 'undefined') {
-      emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams)
-        .then(() => {
+      emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, PUBLIC_KEY)
+        .then((response) => {
+          console.log('EmailJS 전송 성공:', response.status, response.text);
           document.getElementById('modal-user-name').textContent = name;
           modal.classList.add('active');
           form.reset();
         })
         .catch((error) => {
-          console.error('EmailJS 전송 실패:', error);
-          alert('이메일 전송 중 오류가 발생했습니다: ' + (error.text || error.message || '잠시 후 다시 시도해 주세요.'));
+          console.error('EmailJS 전송 실패 상세:', error);
+          const errDetail = error.text || error.message || (typeof error === 'object' ? JSON.stringify(error) : error);
+          alert('이메일 전송 중 오류가 발생했습니다: ' + errDetail);
         })
         .finally(() => {
           if (submitBtn) {
